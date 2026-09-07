@@ -1,10 +1,10 @@
-import { createCase, getAllCases } from '../_lib/caseQueries';
+import { createCase, getAllCases } from '../_lib/caseQueries.js';
 import {
   errorResponse,
   internalErrorResponse,
   jsonResponse,
-} from '../_lib/responses';
-import { validateCaseInput } from '../_lib/validation';
+} from '../_lib/responses.js';
+import { validateCaseInput } from '../_lib/validation.js';
 
 export async function GET(): Promise<Response> {
   try {

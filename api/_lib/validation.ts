@@ -6,7 +6,7 @@ import {
   type CaseModel,
   type CaseModule,
   type CaseStatus,
-} from '../../src/domain/case';
+} from '../../src/domain/case.js';
 
 export type ValidationResult =
   | { ok: true; value: CaseInput }

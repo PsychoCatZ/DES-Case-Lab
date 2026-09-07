@@ -1,10 +1,10 @@
-import { removeCase, updateCase } from '../_lib/caseQueries';
+import { removeCase, updateCase } from '../_lib/caseQueries.js';
 import {
   errorResponse,
   internalErrorResponse,
   jsonResponse,
-} from '../_lib/responses';
-import { validateCaseInput } from '../_lib/validation';
+} from '../_lib/responses.js';
+import { validateCaseInput } from '../_lib/validation.js';
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 

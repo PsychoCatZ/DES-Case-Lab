@@ -1,5 +1,5 @@
-import { isExpertCase, type CaseInput, type ExpertCase } from '../../src/domain/case';
-import { getSqlClient } from './db';
+import { isExpertCase, type CaseInput, type ExpertCase } from '../../src/domain/case.js';
+import { getSqlClient } from './db.js';
 
 export async function getAllCases(): Promise<ExpertCase[]> {
   const sql = getSqlClient();
