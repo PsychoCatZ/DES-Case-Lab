@@ -10,6 +10,7 @@ import { ModelStatsChart } from './components/dashboard/ModelStatsChart';
 import { AppHeader } from './components/layout/AppHeader';
 import { DashboardLayout } from './components/layout/DashboardLayout';
 import { Button } from './components/ui/Button';
+import { getDataSourceConfig } from './config/dataSource';
 import {
   EMPTY_FILTERS,
   type CaseFiltersState,
@@ -17,18 +18,33 @@ import {
   type ExpertCase,
 } from './domain/case';
 import { useCases } from './hooks/useCases';
+import { ApiCaseRepository } from './services/apiCaseRepository';
+import type { CaseRepository } from './services/caseRepository';
 import { LocalCaseRepository, type RecoveryNotice } from './services/localCaseRepository';
 import { filterCases, hasActiveFilters } from './utils/caseFilters';
 import { calculateCaseStats } from './utils/caseStats';
 
+const dataSourceConfig = getDataSourceConfig();
+
 export default function App() {
   const [recoveryNotice, setRecoveryNotice] = useState<RecoveryNotice | null>(null);
-  const repository = useMemo(
-    () => new LocalCaseRepository(window.localStorage, setRecoveryNotice),
+  const repository = useMemo<CaseRepository>(
+    () => dataSourceConfig.source === 'local'
+      ? new LocalCaseRepository(window.localStorage, setRecoveryNotice)
+      : new ApiCaseRepository(dataSourceConfig.apiBaseUrl),
     [],
   );
-  const { cases, isLoading, error, dismissError, createCase, updateCase, removeCase } =
-    useCases(repository);
+  const {
+    cases,
+    isLoading,
+    error,
+    canRetry,
+    retry,
+    dismissError,
+    createCase,
+    updateCase,
+    removeCase,
+  } = useCases(repository);
   const [filters, setFilters] = useState<CaseFiltersState>(EMPTY_FILTERS);
   const [formOpen, setFormOpen] = useState(false);
   const [editingCase, setEditingCase] = useState<ExpertCase | null>(null);
@@ -61,16 +77,23 @@ export default function App() {
           role={error ? 'alert' : 'status'}
         >
           <span>{error ?? recoveryNotice?.message}</span>
-          <Button
-            variant="ghost"
-            aria-label="Закрыть уведомление"
-            onClick={() => {
-              dismissError();
-              setRecoveryNotice(null);
-            }}
-          >
-            ×
-          </Button>
+          <div className="notice__actions">
+            {error && canRetry && (
+              <Button variant="secondary" onClick={() => void retry()}>
+                Повторить
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              aria-label="Закрыть уведомление"
+              onClick={() => {
+                dismissError();
+                setRecoveryNotice(null);
+              }}
+            >
+              ×
+            </Button>
+          </div>
         </div>
       )}
 

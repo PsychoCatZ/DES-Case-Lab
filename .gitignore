@@ -23,6 +23,9 @@ pnpm-debug.log*
 .vscode/
 .idea/
 .codex/
+.vercel/
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+.vercel

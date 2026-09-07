@@ -61,6 +61,8 @@ h2 { margin-bottom: 0; font-size: 1.1rem; line-height: 1.35; }
   color: var(--text-muted); font-size: .875rem;
 }
 .notice--warning { border-color: rgb(242 174 76 / 45%); }
+.notice__actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.notice__actions .button { min-height: 34px; padding-block: 5px; }
 
 .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 14px; }
 .kpi-card {

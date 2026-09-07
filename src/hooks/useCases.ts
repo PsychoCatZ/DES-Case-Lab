@@ -7,14 +7,17 @@ export function useCases(repository: CaseRepository) {
   const [cases, setCases] = useState<ExpertCase[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [canRetry, setCanRetry] = useState(false);
 
   const load = useCallback(async () => {
     setIsLoading(true);
+    setError(null);
+    setCanRetry(false);
     try {
       setCases(sortCasesByCreatedAt(await repository.getAll()));
-      setError(null);
     } catch {
-      setError('Не удалось загрузить локальные данные.');
+      setError('Не удалось загрузить данные. Проверьте соединение и повторите запрос.');
+      setCanRetry(true);
     } finally {
       setIsLoading(false);
     }
@@ -29,9 +32,11 @@ export function useCases(repository: CaseRepository) {
       const createdCase = await repository.create(input);
       setCases((current) => sortCasesByCreatedAt([createdCase, ...current]));
       setError(null);
+      setCanRetry(false);
       return true;
     } catch {
       setError('Не удалось сохранить кейс. Исходные данные не изменены.');
+      setCanRetry(false);
       return false;
     }
   };
@@ -43,9 +48,11 @@ export function useCases(repository: CaseRepository) {
         sortCasesByCreatedAt(current.map((item) => (item.id === id ? updatedCase : item))),
       );
       setError(null);
+      setCanRetry(false);
       return true;
     } catch {
       setError('Не удалось обновить кейс.');
+      setCanRetry(false);
       return false;
     }
   };
@@ -55,9 +62,11 @@ export function useCases(repository: CaseRepository) {
       await repository.remove(id);
       setCases((current) => current.filter((item) => item.id !== id));
       setError(null);
+      setCanRetry(false);
       return true;
     } catch {
       setError('Не удалось удалить кейс.');
+      setCanRetry(false);
       return false;
     }
   };
@@ -66,6 +75,8 @@ export function useCases(repository: CaseRepository) {
     cases,
     isLoading,
     error,
+    canRetry,
+    retry: load,
     dismissError: () => setError(null),
     createCase,
     updateCase,

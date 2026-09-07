@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import {
   CASE_MODELS,
   CASE_MODULES,
@@ -30,6 +30,7 @@ export function CaseForm({ open, item, onClose, onSubmit }: CaseFormProps) {
   const [form, setForm] = useState<CaseInput>(EMPTY_FORM);
   const [isSaving, setIsSaving] = useState(false);
   const [validationError, setValidationError] = useState('');
+  const savingRef = useRef(false);
   const formId = 'case-editor-form';
 
   useEffect(() => {
@@ -49,25 +50,39 @@ export function CaseForm({ open, item, onClose, onSubmit }: CaseFormProps) {
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
+    if (savingRef.current) return;
+
     const cleanForm = { ...form, title: form.title.trim(), response: form.response.trim() };
     if (!cleanForm.title || !cleanForm.response) {
       setValidationError('Заполните название и ответ модели.');
       return;
     }
+    savingRef.current = true;
     setIsSaving(true);
-    const saved = await onSubmit(cleanForm);
-    setIsSaving(false);
-    if (saved) onClose();
+    try {
+      if (await onSubmit(cleanForm)) {
+        onClose();
+      } else {
+        setValidationError('Не удалось сохранить кейс. Повторите попытку.');
+      }
+    } finally {
+      savingRef.current = false;
+      setIsSaving(false);
+    }
+  };
+
+  const close = () => {
+    if (!savingRef.current) onClose();
   };
 
   return (
     <Modal
       open={open}
       title={item ? 'Редактировать кейс' : 'Новый кейс'}
-      onClose={onClose}
+      onClose={close}
       footer={
         <>
-          <Button type="button" variant="ghost" onClick={onClose} disabled={isSaving}>Отмена</Button>
+          <Button type="button" variant="ghost" onClick={close} disabled={isSaving}>Отмена</Button>
           <Button type="submit" form={formId} variant="primary" disabled={isSaving}>
             {isSaving ? 'Сохранение…' : item ? 'Сохранить' : 'Добавить кейс'}
           </Button>
