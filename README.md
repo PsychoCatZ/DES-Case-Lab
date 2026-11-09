@@ -196,3 +196,7 @@ npx vercel build
 ## Статус
 
 **Day 2 MVP завершён.**
+
+## Лицензия
+
+Исходный код распространяется по [лицензии MIT](LICENSE). Copyright (c) 2026 PsychoCatZ.
